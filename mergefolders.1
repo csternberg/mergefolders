@@ -1,0 +1,70 @@
+.TH MERGEFOLDERS 1 "2026-11-01" "mergefolders 1.2" "User Commands"
+.SH NAME
+mergefolders \- merge sibling folders sharing a name prefix or suffix
+.SH SYNOPSIS
+.B mergefolders.py
+[\fB\-hvnolu\fR] {\fB\-b\fR|\fB\-e\fR} \fIN\fR
+.br
+.B mergefolders.py
+\fB\-\-undo\fR [\fB\-\-dry\-run\fR]
+.SH DESCRIPTION
+Groups the folders in the current directory by the first (\fB\-b\fR) or last
+(\fB\-e\fR) \fIN\fR characters of their names. In every group of two or more,
+the folder with the shortest name (ties broken alphabetically) becomes the
+target and the files of the other folders are moved into it. Folders are never
+deleted.
+.PP
+If a file of the same name exists in the target, the incoming file is renamed
+\fIname_01.ext\fR, \fIname_02.ext\fR, ... unless \fB\-\-overwrite\fR is given.
+.PP
+With \fIN\fR = 0, all files from all subfolders (recursively) are moved into the
+current directory instead.
+.PP
+All options are case-insensitive.
+.SH OPTIONS
+.TP
+.BR \-b ", " \-\-begin " " \fIN\fR
+Group by the first \fIN\fR characters.
+.TP
+.BR \-e ", " \-\-end " " \fIN\fR
+Group by the last \fIN\fR characters. Mutually exclusive with \fB\-b\fR.
+.TP
+.BR \-t ", " \-\-target " " \fIDIR\fR
+Instead of merging into the shortest-named folder, move the files of every
+group into \fIDIR\fR/\fIkey\fR, where \fIkey\fR is the shared characters. The
+folder is created if needed. With \fIN\fR = 0 all files go directly into \fIDIR\fR.
+.TP
+.BR \-n ", " \-d ", " \-\-dry\-run
+Print what would be done without changing anything.
+.TP
+.BR \-o ", " \-\-overwrite
+Replace existing files on collision. Replaced files cannot be restored by undo.
+.TP
+.BR \-l ", " \-\-log
+Append all actions to \fIlog.txt\fR.
+.TP
+.BR \-u ", " \-\-undo
+Reverse the last run using \fIundo_merge.json\fR, which is removed on success.
+.TP
+.BR \-h ", " \-\-help
+Show help and exit.
+.TP
+.BR \-v ", " \-\-version
+Show version and exit.
+.SH FILES
+.TP
+.I undo_merge.json
+Written after each run that moved files; read by \fB\-\-undo\fR.
+.TP
+.I log.txt
+Appended to when \fB\-\-log\fR is used.
+.SH EXIT STATUS
+0 on success, 1 if an error occurred or files were skipped, 2 for invalid usage.
+.SH EXAMPLES
+.nf
+mergefolders.py \-\-dry\-run \-b 8
+mergefolders.py \-b 8 \-l
+mergefolders.py \-e 4 \-\-overwrite
+mergefolders.py \-t condensed \-b 5
+mergefolders.py \-u
+.fi
