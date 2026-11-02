@@ -11,11 +11,19 @@ import shutil
 import sys
 from datetime import datetime
 
-VERSION = "1.2"
+VERSION = "1.2.1"
 SCRIPT_NAME = "mergefolders"
 
 UNDO_FILE = "undo_merge.json"
 LOG_FILE = "log.txt"
+SKIP_DIRS = {"$recycle.bin", "recycler", "system volume information", ".trashes"}
+
+
+def skip_dir(name):
+    """Trash and system folders are never merged or emptied (silently), at any depth."""
+    low = name.lower()
+    return low in SKIP_DIRS or low.startswith(".trash")
+
 
 EPILOG = """\
 modes:
@@ -27,6 +35,8 @@ modes:
 For each group of two or more folders, the folder with the shortest name
 (ties: alphabetical) is the target; files from the other folders are moved
 into it. Folders are never deleted, only their files are moved.
+Trash and system folders ($RECYCLE.BIN, RECYCLER, System Volume Information,
+.Trashes, .Trash*) are skipped silently: never grouped, merged or emptied.
 
 With -t DIR / --target DIR, nothing is merged into an existing folder; instead
 every group gets its own folder DIR/<key> (created if needed, key = the shared
@@ -212,6 +222,7 @@ def list_folders(exclude=None):
     with os.scandir(".") as it:
         return sorted(e.name for e in it
                       if e.is_dir(follow_symlinks=False)
+                      and not skip_dir(e.name)
                       and not (exclude and is_within(exclude, e.name)))
 
 
@@ -233,7 +244,8 @@ def collect_all(mover, dest="."):
     for root, dirs, files in os.walk("."):
         # don't pick files up from the destination folder itself
         dirs[:] = sorted(d for d in dirs
-                         if flat or not is_within(os.path.join(root, d), dest))
+                         if not skip_dir(d)
+                         and (flat or not is_within(os.path.join(root, d), dest)))
         if os.path.abspath(root) == os.path.abspath("."):
             continue
         sources.extend(os.path.join(root, f) for f in sorted(files))

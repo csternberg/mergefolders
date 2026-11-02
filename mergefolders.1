@@ -1,4 +1,4 @@
-.TH MERGEFOLDERS 1 "2026-11-01" "mergefolders 1.2" "User Commands"
+.TH MERGEFOLDERS 1 "2026-11-02" "mergefolders 1.2.1" "User Commands"
 .SH NAME
 mergefolders \- merge sibling folders sharing a name prefix or suffix
 .SH SYNOPSIS
@@ -19,6 +19,10 @@ If a file of the same name exists in the target, the incoming file is renamed
 .PP
 With \fIN\fR = 0, all files from all subfolders (recursively) are moved into the
 current directory instead.
+.PP
+Trash and system folders (\fI$RECYCLE.BIN\fR, \fIRECYCLER\fR,
+\fISystem Volume Information\fR, \fI.Trashes\fR, \fI.Trash*\fR) are skipped
+silently: never grouped, merged or emptied, and not searched with \fIN\fR = 0.
 .PP
 All options are case-insensitive.
 .SH OPTIONS

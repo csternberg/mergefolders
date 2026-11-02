@@ -23,6 +23,7 @@ mergefolders.py [-h] [-v] [-n] [-o] [-l] [-u] [-b N | -e N]
 
 All switches are case-insensitive (`-B` = `-b`, `--DRY-RUN` = `--dry-run`).
 `-b` and `-e` are mutually exclusive. Run from the directory that contains the folders.
+Trash and system folders (`$RECYCLE.BIN`, `RECYCLER`, `System Volume Information`, `.Trashes`, `.Trash*`) are skipped silently: never grouped, merged or emptied, and not searched when `N` = 0.
 
 ## How it works
 
